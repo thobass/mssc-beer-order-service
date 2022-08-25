@@ -1,6 +1,6 @@
 package guru.sfg.beer.order.service.services.beer;
 
-import guru.sfg.beer.order.service.web.model.BeerDto;
+import guru.sfg.brewery.model.BeerDto;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public Optional<BeerDto> getBeerById(UUID uuid){
+    public Optional<BeerDto> getBeerById(UUID uuid) {
         return Optional.ofNullable(restTemplate.getForObject(beerServiceHost + BEER_PATH_V1 + uuid.toString(), BeerDto.class));
     }
 
