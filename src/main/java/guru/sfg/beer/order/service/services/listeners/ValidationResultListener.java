@@ -9,6 +9,8 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -18,12 +20,10 @@ public class ValidationResultListener {
 
     @JmsListener(destination = JmsConfig.VALIDATE_ORDER_RESPONSE_QUEUE)
     public void listenForOrderValidation(ValidateOrderResult validateOrderResult) {
+        final UUID beerOrderId = validateOrderResult.getOrderId();
 
-        var beerOrderId = validateOrderResult.getOrderId();
-        var isValid = validateOrderResult.getIsValid();
+        log.debug("Validation Result for Order Id: " + beerOrderId);
 
-        log.debug("Validation Result for Order ID: " + beerOrderId);
-
-        beerOrderManager.processValidationResult(beerOrderId, isValid);
+        beerOrderManager.processValidationResult(beerOrderId, validateOrderResult.getIsValid());
     }
 }
