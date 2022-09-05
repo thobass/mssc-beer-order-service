@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class BeerOrderAllocationResultListener {
     private final BeerOrderManager beerOrderManager;
 
-    @JmsListener(destination = JmsConfig.ALLOCATE_ORDER_RESULT_QUEUE)
+    @JmsListener(destination = JmsConfig.ALLOCATE_ORDER_RESPONSE_QUEUE)
     public void listen(AllocateOrderResult allocateOrderResult) {
         if (!allocateOrderResult.getAllocationError() && !allocateOrderResult.getPendingInventory()) {
             //allocated normally

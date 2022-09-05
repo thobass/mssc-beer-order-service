@@ -16,7 +16,7 @@ public class ValidationResultListener {
     private final JmsTemplate jmsTemplate;
     private final BeerOrderManager beerOrderManager;
 
-    @JmsListener(destination = JmsConfig.VALIDATE_ORDER_RESULT_QUEUE)
+    @JmsListener(destination = JmsConfig.VALIDATE_ORDER_RESPONSE_QUEUE)
     public void listenForOrderValidation(ValidateOrderResult validateOrderResult) {
 
         var beerOrderId = validateOrderResult.getOrderId();
