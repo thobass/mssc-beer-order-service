@@ -10,6 +10,8 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -21,15 +23,21 @@ public class BeerOrderAllocationListener {
         AllocateOrderRequest request = (AllocateOrderRequest) msg.getPayload();
         boolean pendingInventory = false;
         boolean allocationError = false;
+        boolean sendResponse = true;
 
         //set pending inventory
-        if (request.getBeerOrderDto().getCustomerRef() != null && request.getBeerOrderDto().getCustomerRef().equals("partial-allocation")) {
+        if (Objects.equals(request.getBeerOrderDto().getCustomerRef(), "partial-allocation")) {
             pendingInventory = true;
         }
 
         //set allocation error
-        if (request.getBeerOrderDto().getCustomerRef() != null && request.getBeerOrderDto().getCustomerRef().equals("fail-allocation")) {
+        if (Objects.equals(request.getBeerOrderDto().getCustomerRef(), "fail-allocation")) {
             allocationError = true;
+        }
+
+        //set cancel error
+        if (Objects.equals(request.getBeerOrderDto().getCustomerRef(), "dont-allocate")) {
+            sendResponse = false;
         }
 
         boolean finalPendingInventory = pendingInventory;
@@ -42,12 +50,13 @@ public class BeerOrderAllocationListener {
             }
         });
 
-        jmsTemplate.convertAndSend(JmsConfig.ALLOCATE_ORDER_RESPONSE_QUEUE,
-                AllocateOrderResult.builder()
-                        .beerOrderDto(request.getBeerOrderDto())
-                        .pendingInventory(pendingInventory)
-                        .allocationError(allocationError)
-                        .build());
-
+        if (sendResponse) {
+            jmsTemplate.convertAndSend(JmsConfig.ALLOCATE_ORDER_RESPONSE_QUEUE,
+                    AllocateOrderResult.builder()
+                            .beerOrderDto(request.getBeerOrderDto())
+                            .pendingInventory(pendingInventory)
+                            .allocationError(allocationError)
+                            .build());
+        }
     }
 }
